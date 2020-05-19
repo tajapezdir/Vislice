@@ -81,11 +81,10 @@ def nova_igra():
     nakljucna_beseda = random.choice(bazen_besed)
     return Igra(nakljucna_beseda)
 
-class Vislice: # to bo nas container
+class Vislice: #to bo nas container
     """
     Skrbi za trenutno stanje več iger (imel bo več objektov tipa Igra)
     """
-
     def __init__(self):
         # Slovar, ki ID-ju priredi objekt njegove igre
         self.igre = {} # int/vrednosti -> (Igra, stanje)
@@ -99,17 +98,17 @@ class Vislice: # to bo nas container
 
     def nova_igra(self): # to si predstavljaj kot da na banki odpres nov racun
         # dobimo svez id
-        nov_id = self.prost_id_igre()
+        id_igre = self.prost_id_igre()
         # naredimo novo igro
         sveza_igra = nova_igra()
         # vse to shranimo v self.igre
-        self.igre[nov_id] = (sveza_igra, ZACETEK)
+        self.igre[id_igre] = (sveza_igra, ZACETEK)
         # vrnemo nov id
-        return nov_id
+        return id_igre
 
     def ugibaj(self, id_igre, crka):
         # dobimo staro igro ven
-        trenutna_igra, _ = self.igre[id_igre]
+        trenutna_igra, _ = self.igre[id_igre][0]
         # ugibamo crko, dobimo novo stanje
         novo_stanje = trenutna_igra.ugibaj(crka)
         # zapisemo posodobljeno stanje in igro nazaj v "bazo"
