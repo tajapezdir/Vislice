@@ -1,57 +1,47 @@
 import model
 
-
-def izpis_igre(igra):
-    tekst = (
-        'Število preostalih poskusov: {preostali}\n\n'
-        ' {pravilni_del}\n\n'
-        'Neuspeli poskusi: {neuspeli_poskusi}\n\n'
-    ).format(
-        preostali=model.STEVILO_DOVOLJENIH_NAPAK - igra.stevilo_napak() + 1, 
-        pravilni_del=igra.pravilni_del_gesla(),
-        neuspeli_poskusi=igra.nepravilni_ugibi()
-    )
-    return tekst
-
-def izpis_zmage(igra):
-    tekst = (
-        'Bravo, zmagali ste! Geslo je bilo: {geslo} \n\n'
-    ).format(
-        geslo=igra.geslo()
-    )
-    return tekst
+trenutna_igra = model.nova_igra()
 
 def izpis_poraza(igra):
-    tekst = (
-        'Škoda, izgubili ste! Geslo je bilo: {geslo} \n\n'
-    ).format(
-        geslo=igra.geslo()
+    return f"IZGUBIL SI, geslo je bilo: {igra.geslo}."
+
+def izpis_zmage(igra):
+    return (f"ZMAGAL SI, geslo je bilo: {igra.geslo}," + 
+    f"potreboval si {len(igra.napacne_crke())} ugibov.")
+
+def izpis_igre(igra):
+    text = (
+        f"Stanje gesla: {igra.pravilni_del_gesla()} \n"
+        f"Imaš še {model.STEVILO_DOVOLJENIH_NAPAK - igra.stevilo_napak()} možnosti za napako."
     )
-    return tekst
+    return text
 
 def zahtevaj_vnos():
-    return input('Črka: ')
+    return input("Vpiši naslednjo črko:")
 
-def pozeni_vmesnik():
-    
-    igra = model.nova_igra()
+def pozeni_vmesnik(): 
+    # naredimo novo igro
+    trenutna_igra = model.nova_igra()
 
     while True:
-        # najprej izpisemo stanje, da vidimo, koliko crk je ipd.
-        print(izpis_igre(igra))
-        # čakamo na črko od uporabnika
-        poskus = zahtevaj_vnos()
-        igra.ugibaj(poskus)
-        if igra.zmaga():
-            print(izpis_zmage(igra))
-            break
-        elif igra.poraz():
-            print(izpis_poraza)
-            break
-    
-    return
+        # pokazemo mu stanje
+        print(izpis_igre(trenutna_igra))
+        crka = zahtevaj_vnos()
+        trenutna_igra.ugibaj(crka)
 
-# zaženi igro:
+        if trenutna_igra.zmaga():
+            print(izpis_zmage(trenutna_igra))
+            break #konec igre
+
+        if trenutna_igra.poraz():
+            print(izpis_poraza(trenutna_igra))
+            break #konec igre
+
+
 pozeni_vmesnik()
+
+
+
+
 
 
