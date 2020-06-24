@@ -1,4 +1,5 @@
-import random 
+import random
+import json 
 
 STEVILO_DOVOLJENIH_NAPAK = 10
 
@@ -8,6 +9,7 @@ ZACETEK = 'Z'
 PRAVILNA_CRKA = '+'
 PONOVLJENA_CRKA = 'o'
 NAPACNA_CRKA = '-'
+VEC_KOT_ENA_CRKA = ':'
 
 # Konstante za zmago in poraz
 ZMAGA = 'W'
@@ -59,6 +61,9 @@ class Igra:
         return " ".join(self.napacne_crke())
 
     def ugibaj(self, ugibana_crka):
+        if len(ugibana_crka) > 1:
+            return VEC_KOT_ENA_CRKA
+
         ugibana_crka = ugibana_crka.lower()
         if ugibana_crka in self.crke:
             return PONOVLJENA_CRKA
@@ -96,23 +101,46 @@ class Vislice: #to bo nas container
         else:
             return max(self.igre.keys()) + 1 #boljse kot return len(self.igre.keys()) ker lahko brisemo igre
 
-    def nova_igra(self): # to si predstavljaj kot da na banki odpres nov racun
+    def nova_igra(self):
+        self.preberi_iz_datoteke()
+        # to si predstavljaj kot da na banki odpres nov racun
         # dobimo svez id
         id_igre = self.prost_id_igre()
         # naredimo novo igro
         sveza_igra = nova_igra()
         # vse to shranimo v self.igre
         self.igre[id_igre] = (sveza_igra, ZACETEK)
+        self.shrani_v_datoteko()
         # vrnemo nov id
         return id_igre
 
     def ugibaj(self, id_igre, crka):
+        self.preberi_iz_datoteke()
         # dobimo staro igro ven
         trenutna_igra, _ = self.igre[id_igre][0]
         # ugibamo crko, dobimo novo stanje
         novo_stanje = trenutna_igra.ugibaj(crka)
         # zapisemo posodobljeno stanje in igro nazaj v "bazo"
         self.igre[id_igre] = (trenutna_igra, novo_stanje)
+        self.shrani_v_datoteko()
 
+    def shrani_v_datoteko(self):
+        # slovar iger, ki jih igramo
+        # npr. {1: (("balkon","axfghdis"), "+"), 2: (), "", ...} 
+        # {id_igre: ((geslo, ugibane_crke), stanje_igre)}
+        igre = {}
+        for id_igre, (igra, stanje) in self.igre.items():
+            igre[id_igre] = ((igra.geslo, igra.crke), stanje)
+
+        with open('stanje_igre.json', 'w') as out_file:
+            json.dump(igre, out_file)
+
+    def preberi_iz_datoteke(self):
+        with open('stanje_iger.json', 'r') as in_file:
+            igre= json.load(in_file)
+
+        self.igre = {}
+        for id_igre, ((geslo, crke), stanje) in igre.items():
+            self.igre[int(id_igre)] = Igra(geslo, crke), stanje
 
 
